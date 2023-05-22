@@ -1,3 +1,9 @@
+import sqlite3
+
+conn = sqlite3.connect('cartfull.sqlite')
+cursor = conn.cursor()
+
+sql_query = """
 CREATE TABLE IF NOT EXISTS users(
 	uID INTEGER not null,
 	shopLists BLOB,
@@ -13,4 +19,7 @@ CREATE table if not exists newWorld (
 );
 
 CREATE table pakNSave like newWorld;
-CREATE table countDown like newWorld;
+CREATE table countDown like newWorld;"""
+
+conn.execute(sql_query)
+conn.commit()

@@ -1,16 +1,19 @@
-from flask import Flask, request, render_template, session
+from flask import Flask, request, render_template
+# Importing necessary libraries, but we will hae to implement a login system last, as that will be the hardest to deal
 import sqlite3
 
 app = Flask(__name__)
-app.config['SESSION_PERMANENT'] = False
-app.config['SESSION_TYPE']='filesystem'
-session(app)
+DATA_FILE = 'cartfull.sqlite'
+
+
+def get_database_connection():
+    conn = sqlite3.connect(DATA_FILE)
+    return conn, conn.cursor()
 
 
 @app.route('/newUsers', methods=['POST'])
 def new_users():
-    conn = sqlite3.connect('cartfull.sqlite')
-    cursor = conn.cursor()
+    conn, cursor = get_database_connection()
     request_data = request.get_json()
 
     if type(request_data) == list:
@@ -36,18 +39,16 @@ def new_users():
 
 @app.route('/user/<int:user_id>', methods=['GET'])
 def user_prof(user_id):
-    conn = sqlite3.connect('cartfull.sqlite')
-    cursor = conn.cursor()
+    conn, cursor = get_database_connection()
     user_query = """SELECT uAccID, uShopLists FROM users WHERE uID = ?"""
     cursor.execute(user_query, (user_id,))
     user = cursor.fetchall()
-    return render_template('user.html', user_table=user)
+    return render_template('user.html', user_table=user[0])
 
 
 @app.route('/viewUsers', methods=['GET'])
 def view_users():
-    conn = sqlite3.connect('cartfull.sqlite')
-    cursor = conn.cursor()
+    conn, cursor = get_database_connection()
 
     sql_query = """SELECT * FROM users"""
     cursor.execute(sql_query)
