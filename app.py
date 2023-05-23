@@ -11,26 +11,18 @@ def get_database_connection():
     return conn, conn.cursor()
 
 
-@app.route('/newUsers', methods=['POST'])
-def new_users():
+@app.route('/addUsers', methods=['POST'])
+def add_users():
     conn, cursor = get_database_connection()
     request_data = request.get_json()
 
     if type(request_data) == list:
         for i in request_data:
-            new_user = {
-                "uID": i['uID'],
-                "uAccID": i['uAccID']
-            }
-            sql_query = """INSERT INTO users (uID, uAccID) VALUES (?, ?)"""
-            cursor.execute(sql_query, (new_user['uID'], new_user['uAccID']))
+            sql_query = """INSERT INTO users (uID, accID) VALUES (?, ?)"""
+            cursor.execute(sql_query, (i['uID'], i['accID']))
     elif type(request_data) == dict:
-        new_user = {
-            "uID": request_data['uID'],
-            "uAccID": request_data['uAccID']
-        }
-        sql_query = """INSERT INTO users (uID, uAccID) VALUES (?, ?)"""
-        cursor.execute(sql_query, (new_user['uID'], new_user['uAccID']))
+        sql_query = """INSERT INTO users (uID, accID) VALUES (?, ?)"""
+        cursor.execute(sql_query, (request_data['uID'], request_data['accID']))
     else:
         return "Failed to insert to table", 200
     conn.commit()
@@ -40,7 +32,7 @@ def new_users():
 @app.route('/user/<int:user_id>', methods=['GET'])
 def user_prof(user_id):
     conn, cursor = get_database_connection()
-    user_query = """SELECT uAccID, uShopLists FROM users WHERE uID = ?"""
+    user_query = """SELECT accID, uShopLists FROM users WHERE uID = ?"""
     cursor.execute(user_query, (user_id,))
     user = cursor.fetchall()
     return render_template('user.html', user_table=user[0])
@@ -59,6 +51,23 @@ def view_users():
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
+@app.route('/addGroceries/<string:super_market>', methods=['GET', 'POST'])
+def add_groceries(super_market):
+    conn, cursor = get_database_connection()
+    data = request.get_json()
+    query = f"""INSERT INTO {super_market} (gID, gProductName, gPrice, gPPKG, gStock) VALUES (?, ?, ?, ?, ?)"""
+
+    if type(data) == list:
+        for i in data:
+            conn.execute(query, (i['gID'], i['gProductName'], i['gPrice'], 'null', i['gStock']))
+    elif type(data) == dict:
+        cursor.execute(query, (data['gID'], data['gProductName'], data['gPrice'], 'null', data['gStock']))
+    else:
+        return {"Message": "Items failed to add"}, 200
+    conn.commit()
+    return {"Message": "Items Added"}, 201
 
 
 if __name__ == "__main__":

@@ -2,11 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>CartFull</title>
 </head>
 <body>
     <h1>Users in the database:</h1>
     <ul>
+        {% if user_table|length == 0 %}
+        <li>No users in table</li>
+        {% endif %}
         {% for user in user_table %}
         <li>{{ user[1] }}</li>
         {% endfor %}
