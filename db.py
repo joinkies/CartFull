@@ -17,6 +17,7 @@ def supermarket_params(supermarket_name):
         gPrice INTEGER,
         gPPKG INTEGER,
         gStock integer not null,
+        gPic TEXT,
         PRIMARY KEY (gID)
         );"""
 
