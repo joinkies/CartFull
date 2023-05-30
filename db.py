@@ -3,23 +3,25 @@ import sqlite3
 conn = sqlite3.connect('cartfull.sqlite')
 cursor = conn.cursor()
 
-sql_query = """
-CREATE TABLE IF NOT EXISTS users(
-	uID INTEGER not null,
-	shopLists BLOB,
-	PRIMARY KEY (uID)
-);
+conn.execute("""CREATE TABLE IF NOT EXISTS users(
+uID INTEGER not null,
+accID TEXT not null,
+shopLists BLOB,
+PRIMARY KEY (uID));""")
 
-CREATE table if not exists newWorld (
-	gID INTEGER not null,
-	gPrice INTEGER,
-	gPPKG INTEGER,
-	gStock integer,
-	PRIMARY KEY (gID)
-);
 
-CREATE table pakNSave like newWorld;
-CREATE table countDown like newWorld;"""
+def supermarket_params(supermarket_name):
+    return f"""CREATE table if not exists {supermarket_name} (
+        gID INTEGER not null,
+        gProductName TEXT not null,
+        gPrice INTEGER,
+        gPPKG INTEGER,
+        gStock integer not null,
+        gPic TEXT,
+        PRIMARY KEY (gID)
+        );"""
 
-conn.execute(sql_query)
+
+conn.execute(supermarket_params('newWorld'))
+conn.execute(supermarket_params('pakNSave'))
 conn.commit()
